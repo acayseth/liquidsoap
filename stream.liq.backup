@@ -30,29 +30,8 @@ stream_samplerate = int_of_string(environment.get("STREAM_SAMPLERATE"))
 
 discogs_token = environment.get("DISCOGS_TOKEN")
 discogs_enabled = bool_of_string(environment.get("DISCOGS_ENABLED"))
-discogs_cache_max_size = int_of_string(environment.get("DISCOGS_CACHE_MAX_SIZE"))
-
-telegram_enabled = bool_of_string(environment.get("TELEGRAM_ENABLED"))
-telegram_bot_token = environment.get("TELEGRAM_BOT_TOKEN")
-telegram_chat_id = environment.get("TELEGRAM_CHAT_ID")
 
 discogs_cache = ref([])
-
-def send_telegram(msg) =
-  if telegram_enabled and telegram_bot_token != "" and telegram_chat_id != "" then
-    try
-      enc_msg = url.encode(msg)
-      url_base = "https://api.telegram.org/bot#{telegram_bot_token}/sendMessage"
-      url_params = "?chat_id=#{telegram_chat_id}" ^ "&text=#{enc_msg}" ^ "&parse_mode=HTML"
-      full_url = url_base ^ url_params
-      cmd = "curl -s -X POST '#{full_url}' >/dev/null 2>&1"
-      ignore(process.run(cmd))
-      log("Telegram: Sent")
-    catch e do
-      log("Telegram: Error - #{e}")
-    end
-  end
-end
 
 def get_discogs_cover(artist, title, album) =
   if not discogs_enabled or discogs_token == "" then
@@ -82,31 +61,9 @@ def get_discogs_cover(artist, title, album) =
 
         if cover != "" and cover != "null" then
           log("Discogs: Found cover for #{artist} - #{title}")
-          
-          cache_size = list.length(cache)
-          if cache_size >= discogs_cache_max_size then
-            log("Discogs: Cache limit reached, removing oldest")
-            cache = list.tl(cache)
-          end
-          
           discogs_cache := list.add((cache_key, cover), cache)
-          
-          if cache_size mod 100 == 0 and cache_size > 0 then
-            log("Discogs: Cache stats - #{cache_size} entries")
-          end
-          
           cover
         else
-          log("Discogs: No cover found for #{artist} - #{title}")
-          
-          msg = "<b>🎵 No Cover</b>\n\n<b>Artist:</b> #{artist}\n<b>Title:</b> #{title}\n<b>Album:</b> #{album}"
-          send_telegram(msg)
-          
-          cache_size = list.length(cache)
-          if cache_size >= discogs_cache_max_size then
-            cache = list.tl(cache)
-          end
-          
           discogs_cache := list.add((cache_key, ""), cache)
           ""
         end
@@ -122,13 +79,6 @@ def process_metadata(m) =
   artist = m["artist"] ?? ""
   title = m["title"] ?? ""
   album = m["album"] ?? ""
-  filename = m["filename"] ?? "Unknown"
-
-  if artist == "" or title == "" then
-    log("WARNING: Missing metadata")
-    msg = "<b>⚠️ Missing Metadata</b>\n\n<b>File:</b> #{filename}\n<b>Artist:</b> #{if artist == "" then \"MISSING\" else artist end}\n<b>Title:</b> #{if title == "" then \"MISSING\" else title end}"
-    send_telegram(msg)
-  end
 
   stream_title = if artist != "" and title != "" then
     "#{artist} - #{title}"

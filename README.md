@@ -113,6 +113,12 @@ LOG_LEVEL=4
 # Discogs API (opțional - pentru album covers)
 DISCOGS_ENABLED=true
 DISCOGS_TOKEN=your_discogs_token_here
+DISCOGS_CACHE_MAX_SIZE=10000  # Limită cache (10,000 intrări = ~2.5MB)
+
+# Telegram Notifications (opțional - alerte pentru metadata/covers lipsă)
+TELEGRAM_ENABLED=false
+TELEGRAM_BOT_TOKEN=your_bot_token_here
+TELEGRAM_CHAT_ID=your_chat_id_here
 ```
 
 ### 3. Obține Discogs API Token (Opțional)
@@ -127,6 +133,29 @@ Pentru album covers automate:
    DISCOGS_ENABLED=true
    DISCOGS_TOKEN=your_token_here
    ```
+
+### 4. Configurare Telegram Notifications (Opțional)
+
+Pentru a primi alerte când lipsesc metadata sau album covers:
+
+1. Deschide Telegram și caută **@BotFather**
+2. Trimite `/newbot` și urmează instrucțiunile
+3. Copiază **Bot Token** primit
+4. Trimite un mesaj bot-ului tău (orice mesaj)
+5. Deschide în browser: `https://api.telegram.org/bot<TOKEN>/getUpdates`
+6. Caută `"chat":{"id":123456789` și copiază **chat_id**
+7. Adaugă în `.env`:
+   ```bash
+   TELEGRAM_ENABLED=true
+   TELEGRAM_BOT_TOKEN=123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
+   TELEGRAM_CHAT_ID=123456789
+   ```
+
+**Notificări primite:**
+
+- 🎵 Album cover not found pe Discogs
+- ⚠️ Metadata lipsă (artist sau title)
+- Informații complete despre fișier pentru debugging
 
 ## 🚀 Rulare
 
@@ -287,6 +316,14 @@ CU cache:
   Redare 2: 0 requests (din cache) ✅
   Total: 100 requests (50% reducere!)
 ```
+
+**Limită cache:**
+
+- Default: 10,000 intrări (configurabil via `DISCOGS_CACHE_MAX_SIZE`)
+- Dimensiune estimată: ~2.5 MB pentru 10,000 intrări
+- Când se atinge limita, se șterge cea mai veche intrare (FIFO)
+- Cache-ul se resetează la restart container
+- Statistici afișate la fiecare 100 intrări noi
 
 ### Format Metadata ICY
 
