@@ -29,6 +29,7 @@ liquidsoap/
 ### Pas cu Pas - Fluxul de Streaming
 
 #### 1. **Inițializare și Configurare**
+
 ```
 stream.liq pornește
     ↓
@@ -147,6 +148,7 @@ Liquidsoap citește **ID3v2 tags** din fișierele MP3 și le convertește în fo
 ```
 
 **Exemplu Discogs API Flow (cu caching):**
+
 ```
 Prima redare a piesei:
   Artist: "Sasha", Title: "Clouds", Album: "Airdrawndagger"
@@ -179,13 +181,13 @@ A doua redare (aceeași piesă):
 
 **Mapare completă ID3v2 → ICY:**
 
-| ID3v2 Tag | Liquidsoap Key | ICY Metadata | Exemplu |
-|-----------|---------------|--------------|---------|
-| TIT2 | `title` | StreamTitle | "Clouds" |
-| TPE1 | `artist` | StreamTitle | "Sasha" |
-| TALB | `album` | *(pentru Discogs)* | "Airdrawndagger" |
-| COMM | `comment` | StreamUrl | "https://..." |
-| APIC | `coverart` | StreamUrl | *(binary → URL)* |
+| ID3v2 Tag | Liquidsoap Key | ICY Metadata       | Exemplu          |
+| --------- | -------------- | ------------------ | ---------------- |
+| TIT2      | `title`        | StreamTitle        | "Clouds"         |
+| TPE1      | `artist`       | StreamTitle        | "Sasha"          |
+| TALB      | `album`        | _(pentru Discogs)_ | "Airdrawndagger" |
+| COMM      | `comment`      | StreamUrl          | "https://..."    |
+| APIC      | `coverart`     | StreamUrl          | _(binary → URL)_ |
 
 #### 5. **Procesare Audio**
 
@@ -319,13 +321,14 @@ cp .env.example .env
 
 Poți alege între 3 formate de encoding:
 
-| Format | Calitate | Compatibilitate | Recomandare |
-|--------|----------|------------------|-------------|
-| **MP3** | Bună | ✅ Maximă (toate device-urile) | General purpose |
+| Format           | Calitate  | Compatibilitate                    | Recomandare                        |
+| ---------------- | --------- | ---------------------------------- | ---------------------------------- |
+| **MP3**          | Bună      | ✅ Maximă (toate device-urile)     | General purpose                    |
 | **Vorbis** (OGG) | Excelentă | ✅ Bună (majoritatea browser-elor) | Calitate superioară la bitrate mic |
-| **Opus** | Excelentă | ⚠️ Modernă (browsere noi) | Streaming low-latency |
+| **Opus**         | Excelentă | ⚠️ Modernă (browsere noi)          | Streaming low-latency              |
 
 **Configurare format:**
+
 ```bash
 # MP3 (recomandat pentru compatibilitate maximă)
 STREAM_FORMAT=mp3
@@ -346,10 +349,10 @@ STREAM_SAMPLERATE=48000
 **Recomandări bitrate:**
 
 | Format | Low | Medium | High | Lossless-like |
-|--------|-----|--------|------|---------------|
-| MP3 | 128 | 192 | 256 | 320 |
-| Vorbis | 96 | 160 | 224 | 320 |
-| Opus | 64 | 96 | 128 | 192 |
+| ------ | --- | ------ | ---- | ------------- |
+| MP3    | 128 | 192    | 256  | 320           |
+| Vorbis | 96  | 160    | 224  | 320           |
+| Opus   | 64  | 96     | 128  | 192           |
 
 ```bash
 # Icecast Server Configuration
@@ -365,6 +368,7 @@ RADIO_GENRE=Electronic
 RADIO_URL=http://myradio.com
 
 # Harbor (Live Input) Configuration
+HARBOR_ENABLED=true
 HARBOR_PORT=8001
 HARBOR_PASSWORD=dj_password_here
 HARBOR_USER=source
@@ -409,6 +413,7 @@ docker run -d \
 ```
 
 **Volume mounts:**
+
 - `/app/storage/songs` - Mount biblioteca ta de muzică (read-only)
   - La start, containerul scanează automat pentru `.mp3`, `.flac`, `.aac`, `.ogg`, `.m4a`
   - Generează automat `/app/storage/playlists/songs.m3u`
@@ -419,17 +424,17 @@ docker run -d \
 ### Cu Docker Compose
 
 ```yaml
-version: '3'
+version: "3"
 services:
   liquidsoap:
     build: .
     container_name: liquidsoap
     ports:
-      - "8001:8001"  # Harbor (Live input)
-      - "1234:1234"  # Telnet
+      - "8001:8001" # Harbor (Live input)
+      - "1234:1234" # Telnet
     volumes:
-      - /path/to/your/music:/app/storage/songs:ro      # Your music library
-      - /path/to/your/jingles:/app/storage/jingles:ro  # Jingles (optional)
+      - /path/to/your/music:/app/storage/songs:ro # Your music library
+      - /path/to/your/jingles:/app/storage/jingles:ro # Jingles (optional)
     env_file:
       - .env
     restart: unless-stopped
@@ -450,6 +455,7 @@ Când containerul pornește, `entrypoint.sh` va:
    - `/app/storage/playlists/songs.m3u`
    - `/app/storage/playlists/jingles.m3u`
 5. **Afișează statistici:**
+
    ```
    ✓ Found 1523 songs
    ✓ Playlist saved to /app/storage/playlists/songs.m3u
@@ -461,6 +467,7 @@ Când containerul pornește, `entrypoint.sh` va:
    ```
 
 **Avantaje:**
+
 - ✅ Zero configurare manuală
 - ✅ Scanare recursivă (toate subdirectoarele)
 - ✅ Playlist-ul se actualizează la restart
@@ -468,6 +475,7 @@ Când containerul pornește, `entrypoint.sh` va:
 - ✅ Mount-uri separate pentru songs și jingles
 
 **Manual playlist update:**
+
 ```bash
 # Regenerează playlist-ul fără restart
 docker exec liquidsoap bash -c "find /app/storage/songs -type f \( -name '*.mp3' -o -name '*.flac' -o -name '*.aac' -o -name '*.ogg' -o -name '*.m4a' \) > /app/storage/playlists/songs.m3u"
@@ -501,6 +509,7 @@ docker exec liquidsoap bash -c "find /app/storage/songs -type f \( -name '*.mp3'
 ### Mod de lucru
 
 **Auto-generare (Recomandat)**
+
 ```bash
 # Mount bibliotecile tale
 docker run -d \
@@ -516,6 +525,7 @@ docker run -d \
 ```
 
 **Playlist manual (opțional)**
+
 ```bash
 # Poți crea și manual playlist-uri custom
 docker exec liquidsoap vi /app/storage/playlists/songs.m3u
@@ -524,6 +534,7 @@ docker exec liquidsoap vi /app/storage/playlists/songs.m3u
 ### Crearea playlist-urilor
 
 **songs.m3u:**
+
 ```
 /app/storage/songs/track1.mp3
 /app/storage/songs/track2.mp3
@@ -531,6 +542,7 @@ docker exec liquidsoap vi /app/storage/playlists/songs.m3u
 ```
 
 **jingles.m3u:**
+
 ```
 /app/storage/jingles/jingle1.mp3
 /app/storage/jingles/jingle2.mp3
@@ -587,6 +599,7 @@ ffmpeg -re -i input.mp3 -codec:a libmp3lame -b:a 192k \
 ### 📡 Cum primesc clienții metadata (ID3v2 → ICY)
 
 **Conversie automată:**
+
 - **Input:** Fișiere MP3 cu **ID3v2 tags** (TIT2, TPE1, TALB, COMM, APIC)
 - **Processing:** Liquidsoap extrage și procesează metadata
 - **Output:** Stream cu **ICY metadata** (StreamTitle, StreamUrl)
@@ -612,6 +625,7 @@ ffmpeg -re -i input.mp3 -codec:a libmp3lame -b:a 192k \
 ```
 
 **Configurații importante:**
+
 - `icy_metadata="true"` - activează ICY protocol
 - `insert_metadata(radio)` - asigură refresh periodic
 - `public=true` - vizibilitate în directoare
@@ -630,6 +644,7 @@ ffmpeg -re -i input.mp3 -codec:a libmp3lame -b:a 192k \
 **Soluție:** Cache în memorie cu key `"Artist|Title|Album"`
 
 **Performanță:**
+
 ```
 Playlist cu 100 melodii:
 
@@ -647,6 +662,7 @@ CU cache:
 ```
 
 **În log-uri:**
+
 ```
 # Prima redare
 Discogs: Found cover for Sasha - Clouds: https://...
@@ -656,6 +672,7 @@ Discogs: Using cached cover for Sasha - Clouds
 ```
 
 **Caracteristici:**
+
 - ✅ Cache persistent pe durata rulării
 - ✅ Negative caching (cache-uiește și rezultate goale)
 - ✅ Respectă API rate limits (60 req/min)
@@ -684,6 +701,7 @@ id3v2 --comment "https://example.com/cover.jpg" song.mp3
 ### Metadata pentru Jingles
 
 Jingles-urile au metadata hardcodată:
+
 ```json
 {
   "StreamTitle": "Jingle",
@@ -696,11 +714,13 @@ Jingles-urile au metadata hardcodată:
 ### Telnet Interface
 
 Conectare:
+
 ```bash
 telnet localhost 1234
 ```
 
 Comenzi utile:
+
 ```
 # Vezi statusul
 request.metadata
@@ -761,11 +781,13 @@ ffplay http://localhost:8000/stream
 ### Playlist-ul jingles.m3u este gol
 
 **Comportament:**
+
 - Stream-ul va continua fără probleme
 - Va reda doar melodii (fără jingles)
 - În log-uri vei vedea: `WARNING: Jingles playlist empty or unavailable, playing songs only`
 
 **Flux de fallback:**
+
 ```
 jingles.m3u gol sau lipsă
     ↓
@@ -781,6 +803,7 @@ Stream continuă normal (doar melodii)
 ```
 
 **Rezolvare:**
+
 1. Adaugă fișiere MP3 în `/app/storage/jingles/`
 2. Actualizează `jingles.m3u`:
    ```
@@ -793,9 +816,42 @@ Stream continuă normal (doar melodii)
 
 ### Live input nu funcționează
 
-1. Verifică că portul 8001 este deschis
-2. Verifică parola în DJ software
-3. Verifică că formatul este MP3
+1. Verifică că `HARBOR_ENABLED=true` în `.env`
+2. Verifică că portul 8001 este deschis
+3. Verifică parola în DJ software
+4. Verifică că formatul este MP3
+
+### Dezactivare Harbor (live input)
+
+Dacă nu ai nevoie de live streaming, poți dezactiva Harbor:
+
+```bash
+HARBOR_ENABLED=false
+```
+
+Acest lucru va:
+
+- Dezactiva portul 8001
+- Reduce consumul de resurse
+- Stream-ul va reda doar playlist-uri (songs + jingles)
+
+### Dezactivare Telnet
+
+Dacă nu ai nevoie de control telnet, poți dezactiva:
+
+```bash
+TELNET_ENABLED=false
+```
+
+### Configurare Log Level
+
+Ajustează nivelul de logging (1=critical, 2=severe, 3=important, 4=info, 5=debug):
+
+```bash
+LOG_LEVEL=4  # Default: info
+LOG_LEVEL=2  # Minimal: doar erori severe
+LOG_LEVEL=5  # Maxim: debug complet
+```
 
 ## 📚 Referințe
 

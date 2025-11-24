@@ -8,6 +8,7 @@ ENV ICECAST_HOST=icecast \
     RADIO_DESCRIPTION="Radio Dream Stream" \
     RADIO_GENRE=Various \
     RADIO_URL=http://localhost:8000 \
+    HARBOR_ENABLED=true \
     HARBOR_PORT=8001 \
     HARBOR_PASSWORD=hackme \
     HARBOR_USER=source \
@@ -25,16 +26,15 @@ ENV ICECAST_HOST=icecast \
 USER root
 
 RUN apt-get update && apt-get install -y \
-    ffmpeg \
     curl \
     jq \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY environment.liq funcs.liq stream.liq entrypoint.sh ./
+COPY stream.liq entrypoint.sh ./
 
-RUN chmod +x stream.liq entrypoint.sh && \
+RUN chmod +x entrypoint.sh && \
     chown -R liquidsoap:liquidsoap /app
 
 USER liquidsoap

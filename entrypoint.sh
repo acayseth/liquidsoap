@@ -56,7 +56,7 @@ echo "  Stream Format: ${STREAM_FORMAT:-mp3}"
 echo "  Bitrate: ${STREAM_BITRATE:-320} kbps"
 echo "  Samplerate: ${STREAM_SAMPLERATE:-44100} Hz"
 echo "  Icecast: ${ICECAST_HOST:-icecast}:${ICECAST_PORT:-8000}"
-echo "  Mount: /${ICECAST_MOUNT_HQ:-stream-hq}"
+echo "  Mount: /${ICECAST_MOUNT:-stream}"
 echo "  Discogs API: ${DISCOGS_ENABLED:-false}"
 echo ""
 
