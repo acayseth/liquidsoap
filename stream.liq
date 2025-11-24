@@ -3,16 +3,16 @@
 %include "environment.liq"
 %include "funcs.liq"
 
-set("log.file", log_file_enabled)
-set("log.file.path", log_file_path)
 set("log.level", log_level)
+set("log.stdout", true)
+set("log.file", false)
 
 set("server.telnet", telnet_enabled)
 set("server.telnet.bind_addr", "0.0.0.0")
 set("server.telnet.port", telnet_port)
 
-set("frame.audio.samplerate", 44100)
-set("frame.audio.channels", 2)
+set("frame.audio.samplerate", audio_samplerate)
+set("frame.audio.channels", audio_channels)
 
 songs = playlist(
   mode="randomize",
@@ -90,9 +90,9 @@ output.icecast(
   host=icecast_host,
   port=icecast_port,
   password=icecast_password,
-  mount=icecast_mount_hq,
+  mount=icecast_mount,
   name=radio_name,
-  description="High Quality Stream - #{string.uppercase(stream_format)} #{stream_bitrate}kbps",
+  description=radio_description,
   genre=radio_genre,
   url=radio_url,
   icy_metadata="true",

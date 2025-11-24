@@ -3,7 +3,6 @@ icecast_host = getenv(default="icecast", "ICECAST_HOST")
 icecast_port = int_of_string(getenv(default="8000", "ICECAST_PORT"))
 icecast_password = getenv(default="hackme", "ICECAST_PASSWORD")
 icecast_mount = getenv(default="stream", "ICECAST_MOUNT")
-icecast_mount_hq = getenv(default="stream-hq", "ICECAST_MOUNT_HQ")
 
 # Radio station information
 radio_name = getenv(default="Radio Dream", "RADIO_NAME")
@@ -21,8 +20,6 @@ telnet_enabled = bool_of_string(getenv(default="true", "TELNET_ENABLED"))
 telnet_port = int_of_string(getenv(default="1234", "TELNET_PORT"))
 
 # Logging configuration
-log_file_enabled = bool_of_string(getenv(default="true", "LOG_FILE_ENABLED"))
-log_file_path = getenv(default="/var/log/liquidsoap/stream.log", "LOG_FILE_PATH")
 log_level = int_of_string(getenv(default="4", "LOG_LEVEL"))
 
 # Discogs API configuration

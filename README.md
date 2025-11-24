@@ -221,11 +221,12 @@ Stream procesat
 │ output.icecast()                 │
 ├──────────────────────────────────┤
 │                                  │
-│ Encoder: MP3                     │
-│ Bitrate: 320kbps (HQ)            │
+│ Encoder: Configurable            │
+│ (MP3/Vorbis/Opus)                │
+│ Bitrate: Configurable            │
 │                                  │
 │ Server: icecast_host:port        │
-│ Mount: /stream-hq                │
+│ Mount: /stream                   │
 │                                  │
 │ Metadata incluse:                │
 │  - StreamTitle                   │
@@ -235,7 +236,7 @@ Stream procesat
 └──────────────────────────────────┘
     ↓
 Stream disponibil la:
-http://icecast:8000/stream-hq
+http://icecast:8000/stream
 ```
 
 ### 🔄 Ciclul Complet
@@ -293,8 +294,8 @@ http://icecast:8000/stream-hq
                ▼
 ┌─────────────────────────────────────────┐
 │ Output to Icecast                       │
-│ - Encode to MP3 320kbps                 │
-│ - Send to icecast:8000/stream-hq        │
+│ - Encode based on STREAM_FORMAT         │
+│ - Send to icecast:8000/stream           │
 │ - Include all metadata                  │
 └──────────────┬──────────────────────────┘
                │
@@ -356,7 +357,6 @@ ICECAST_HOST=icecast
 ICECAST_PORT=8000
 ICECAST_PASSWORD=your_password_here
 ICECAST_MOUNT=stream
-ICECAST_MOUNT_HQ=stream-hq
 
 # Radio Station Information
 RADIO_NAME=My Radio Station
@@ -594,10 +594,10 @@ ffmpeg -re -i input.mp3 -codec:a libmp3lame -b:a 192k \
 **Flux pentru clienți noi:**
 
 ```
-1. Client conectează la http://icecast:8000/stream-hq
+1. Client conectează la http://icecast:8000/stream
    ↓
 2. Icecast trimite HTTP headers:
-   icy-name: Radio Dream HQ
+   icy-name: Radio Dream
    icy-genre: Various
    icy-metaint: 16000  ← metadata la fiecare 16KB
    ↓
@@ -729,13 +729,13 @@ docker logs -f liquidsoap
 
 ```bash
 # Testează stream-ul
-curl -I http://localhost:8000/stream-hq
+curl -I http://localhost:8000/stream
 
 # Ascultă cu mpv
-mpv http://localhost:8000/stream-hq
+mpv http://localhost:8000/stream
 
 # Ascultă cu ffplay
-ffplay http://localhost:8000/stream-hq
+ffplay http://localhost:8000/stream
 ```
 
 ## 🐛 Troubleshooting
